@@ -1,6 +1,6 @@
 import ballerina/http;
 
-type UKresponse record {|
+type DhlUkResponse record {|
     string url;
     record {|
         string id;
@@ -11,7 +11,7 @@ type UKresponse record {|
     |}[] shipments;
 |};
 
-type DPIresponse record {|
+type DhlDpiResponse record {|
     record {|
         string status;
         string statusCode;
@@ -25,27 +25,22 @@ enum Country {
     DE
 }
 
-type TrackingReq record {
-    string trackingNumber;
-    string country;
-};
+service /shipping on new http:Listener(8080) {
 
-service /shipping on new http:Listener(9090) {
-
-    resource function get tracking(string trackingNumber, string country) returns string|error {
+    resource function get tracking(string trackingNumber, Country country) returns string|error {
+        
+        http:Client dhl = check new ("http://api.dhl.com.balmock.io");
         match country {
             UK => {
-                http:Client ukClient = check new ("http://api.parceluk.com.balmock.io");
-                UKresponse response = check ukClient->/tracking/v1/shipments(trackingNumber = trackingNumber);
+                DhlUkResponse response = check dhl->/parceluk/tracking/v1/shipments(trackingNumber = trackingNumber);
                 return response.shipments[0].status.status;
             }
             DE => {
-                http:Client deClient = check new ("http://api.dpi.com.balmock.io");
-                DPIresponse response = check deClient->/tracking/v1/trackings/[trackingNumber];
+                DhlDpiResponse response = check dhl->/dpi/tracking/v1/trackings/[trackingNumber];
                 return response.events[0].status;
             }
             _ => {
-                return "Invalid country";
+                return error("County not supported");
             }
         }
     }
