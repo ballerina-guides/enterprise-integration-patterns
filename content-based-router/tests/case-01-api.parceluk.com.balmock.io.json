@@ -1,0 +1,10 @@
+{
+    "url":"",
+    "shipments":[{
+        "id":"123A",
+        "status": {
+            "statusCode": "DELIVERED",
+            "status": "Shipment delivered successfully"
+        }
+    }]
+}

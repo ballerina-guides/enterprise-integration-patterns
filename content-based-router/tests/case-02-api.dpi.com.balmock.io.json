@@ -1,0 +1,8 @@
+{
+    "publicUrl":"",
+    "barcode":"B987",
+    "events":[{
+        "statusCode":"IN TRANSIT",
+        "status":"Shipment information uploaded to Deutsche Post"
+    }]
+}
