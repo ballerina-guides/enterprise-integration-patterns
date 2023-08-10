@@ -1,0 +1,19 @@
+{
+    "id": "1a873a9e-483c-13d3-6638-f298aabf0a9e",
+    "providerName": "FlyB",
+    "dateTimeUTC": "2023-08-10T03:25:37.0873765",
+    "httpStatusCode": "OK",
+    "pagination": null,
+    "problem": null,
+    "reimbursement": {
+        "reimbursementID": "5b3671e5-1078-4ded-9bd4-008eef333c5a",
+        "name": "Support Services Reimbursement",
+        "accountID": "3247c2ad-7aea-4b85-aa8b-59c7db98d49a",
+        "currentRecord": true,
+        "standardAmount": 1000,
+        "standardTypeOfUnits": "MONTHLY",
+        "standardRatePerUnit": 1.5,
+        "reimbursementCategory": "GST",
+        "calculationType": "FixedAmount"
+    }
+}
