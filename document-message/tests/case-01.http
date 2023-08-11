@@ -1,0 +1,7 @@
+POST http://localhost:8080/upload/csv
+
+{
+    "path": "./tests/leads.csv",
+    "CRM_ORG": "4564567",
+    "feature": "bulk-write"
+}
