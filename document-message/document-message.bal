@@ -17,15 +17,14 @@ type ZohoResponse record {
     |} details;
 };
 
-service /upload on new http:Listener(8080) {
-
-    resource function post csv(CsvRequest csvRequest) returns ZohoResponse|error {
+service /api on new http:Listener(8080) {
+    resource function post uploadCsv(CsvRequest csvRequest) returns ZohoResponse|error {
         http:Request request = new;
         request.addHeader("CRM_ORG", csvRequest.CRM_ORG);
         request.addHeader("feature", csvRequest.feature);
         request.setFileAsPayload(csvRequest.path, contentType = mime:MULTIPART_FORM_DATA);
         
-        http:Client zohoClient = check new ("http://api.zoho.com.balmock.io");
-        return zohoClient->/crm/v5/upload.post(request);
+        http:Client targetClient = check new ("http://api.zoho.com.balmock.io");
+        return targetClient->/crm/v5/upload.post(request);
     }
 }
