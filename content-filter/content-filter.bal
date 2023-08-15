@@ -1,49 +1,32 @@
 import ballerina/http;
 
-type ReimbursementTemplate record {
+type DetailedReimbursementTemplate record {
     string reimbursementTypeID;
     string reimbursementTypeName;
-    float? fixedAmount;
+    float fixedAmount;
     float? ratePerUnit;
     float? numberOfUnits;
 };
 
-type XeroRequest record {
+type FilteredReimbursementTemplate record {
     string reimbursementTypeID;
-    float fixedAmount?;
-    float ratePerUnit?;
-    float numberOfUnits?;
+    float fixedAmount;
 };
 
 type Reimbursement record {
     string id;
     record {
         string reimbursementTypeID;
-        float? fixedAmount;
-        float? ratePerUnit;
-        float? numberOfUnits;
+        float fixedAmount;
     }[] reimbursementTemplates;
 };
 
 service /payroll on new http:Listener(8080) {
 
-    resource function post employees/[string id]/paytemplate/reimbursements(ReimbursementTemplate[] templates) returns Reimbursement|error {
+    resource function post employees/[string id]/paytemplate/reimbursements(DetailedReimbursementTemplate[] templates) returns Reimbursement|error {
         http:Client xeroClient = check new ("http://api.xero.com.balmock.io");
-        XeroRequest[] xeroRequests = from ReimbursementTemplate template in templates select createXeroRequest(template);
-        return xeroClient->/payroll\.xro/'2\.0/rmployees/[id]/paytemplate/reimbursements.post(xeroRequests);
+        FilteredReimbursementTemplate[] reimbursementRequests = from DetailedReimbursementTemplate template in templates
+            select {reimbursementTypeID: template.reimbursementTypeID, fixedAmount: template.fixedAmount};
+        return xeroClient->/payroll\.xro/'2\.0/rmployees/[id]/paytemplate/reimbursements.post(reimbursementRequests);
     }
-}
-
-function createXeroRequest(ReimbursementTemplate template) returns XeroRequest {
-    if template.fixedAmount !is () {
-        return {
-            reimbursementTypeID: template.reimbursementTypeID,
-            fixedAmount: template.fixedAmount
-        };
-    }
-    return {
-        reimbursementTypeID: template.reimbursementTypeID,
-        ratePerUnit: template.ratePerUnit,
-        numberOfUnits: template.numberOfUnits
-    };
 }

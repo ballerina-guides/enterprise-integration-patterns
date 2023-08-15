@@ -4,7 +4,7 @@ POST http://localhost:8080/payroll/employees/907f059924cc1acad24e950ef7a9b249/pa
     {
         "reimbursementTypeID": "83791a58-e043-4883-ad53-6f4cba62c313",
         "reimbursementTypeName": "GST",
-        "fixedAmount": null,
+        "fixedAmount": 1000.0,
         "numberOfUnits": null,
         "ratePerUnit": null,
         "name": "Internet"
@@ -12,9 +12,9 @@ POST http://localhost:8080/payroll/employees/907f059924cc1acad24e950ef7a9b249/pa
     {
         "reimbursementTypeID": "3242f696-c71e-47e1-9393-91fa613d9619",
         "reimbursementTypeName": "NoGST",
-        "fixedAmount": null,
-        "numberOfUnits": 2,
-        "ratePerUnit": 20,
+        "fixedAmount": 1500.50,
+        "numberOfUnits": null,
+        "ratePerUnit": null,
         "name": "Entertainment"
     }
 ]
