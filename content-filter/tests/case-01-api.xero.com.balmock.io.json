@@ -12,7 +12,7 @@
             "numberOfUnits": null,
             "fixedAmount": 1000.0,
             "reimbursementTypeID": "83791a58-e043-4883-ad53-6f4cba62c313",
-            "name": "Internet"
+            "name": "Internet Allowance"
         },
         {
             "payTemplateReimbursementID": "5804b0ad-d0e7-4f74-a0e0-d8bc815cfee5",
@@ -20,7 +20,7 @@
             "numberOfUnits": null,
             "fixedAmount": 1500.50,
             "reimbursementTypeID": "3242f696-c71e-47e1-9393-91fa613d9619",
-            "name": "Entertainment"
+            "name": "Parking Expenses"
         }
     ]
 }

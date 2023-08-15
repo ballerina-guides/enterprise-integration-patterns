@@ -4,8 +4,6 @@ type DetailedReimbursementTemplate record {
     string reimbursementTypeID;
     string reimbursementTypeName;
     float fixedAmount;
-    float? ratePerUnit;
-    float? numberOfUnits;
 };
 
 type FilteredReimbursementTemplate record {
@@ -27,6 +25,6 @@ service /payroll on new http:Listener(8080) {
         http:Client xeroClient = check new ("http://api.xero.com.balmock.io");
         FilteredReimbursementTemplate[] reimbursementRequests = from DetailedReimbursementTemplate template in templates
             select {reimbursementTypeID: template.reimbursementTypeID, fixedAmount: template.fixedAmount};
-        return xeroClient->/payroll\.xro/'2\.0/rmployees/[id]/paytemplate/reimbursements.post(reimbursementRequests);
+        return xeroClient->/payroll\.xro/'2\.0/employees/[id]/paytemplate/reimbursements.post(reimbursementRequests);
     }
 }
