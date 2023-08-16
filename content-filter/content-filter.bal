@@ -6,7 +6,7 @@ type DetailedReimbursementTemplate record {
     float fixedAmount;
 };
 
-type FilteredReimbursementTemplate record {
+type ReimbursementTemplate record {
     string reimbursementTypeID;
     float fixedAmount;
 };
@@ -22,9 +22,9 @@ type Reimbursement record {
 service /payroll on new http:Listener(8080) {
 
     resource function post employees/[string id]/paytemplate/reimbursements(DetailedReimbursementTemplate[] templates) returns Reimbursement|error {
-        http:Client xeroClient = check new ("http://api.xero.com.balmock.io");
-        FilteredReimbursementTemplate[] reimbursementRequests = from DetailedReimbursementTemplate template in templates
-            select {reimbursementTypeID: template.reimbursementTypeID, fixedAmount: template.fixedAmount};
-        return xeroClient->/payroll\.xro/'2\.0/employees/[id]/paytemplate/reimbursements.post(reimbursementRequests);
+        http:Client xero = check new ("http://api.xero.com.balmock.io");
+        ReimbursementTemplate[] reimbursementRequests = from var {reimbursementTypeID, fixedAmount} in templates
+                                                        select {reimbursementTypeID, fixedAmount};
+        return xero->/payrollxro/employees/[id]/paytemplate/reimbursements.post(reimbursementRequests);
     }
 }
