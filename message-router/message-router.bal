@@ -25,10 +25,9 @@ enum Country {
     DE
 }
 
-service /shipping on new http:Listener(8080) {
+service /shipments on new http:Listener(8080) {
 
-    resource function get tracking(string trackingNumber, Country country) returns string|error {
-        
+    resource function get [Country country]/[string trackingNumber]/status() returns string|error {
         http:Client dhl = check new ("http://api.dhl.com.balmock.io");
         match country {
             UK => {
