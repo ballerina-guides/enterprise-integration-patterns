@@ -15,7 +15,7 @@ type WireTapRequest record {|
 |};
 
 type StockResponse record {
-    string parentHandlingUnitUUID;
+    string ParentHandlingUnitUUID;
     string StockItemUUID;
     string EWMWarehouse;
     string HandlingUnitNumber;
@@ -23,12 +23,12 @@ type StockResponse record {
     string CountryOfOrigin;
 };
 
-http:Client wh = check new("http://api.sap.com.balmock.io");
+http:Client sapClient = check new("http://api.sap.com.balmock.io");
 
 service /warehouse on new http:Listener(8080) {
     
     resource function get stock(string parentId, string productId) returns StockResponse|error {
-        StockResponse result = check wh->/WarehouseAvailableStock/[parentId]/[productId];
+        StockResponse result = check sapClient->/WarehousePhysicalStockProducts/[parentId]/[productId];
         worker w returns error? {
             check wiretap({'table: "stock", severity: "INFO", message: result.toString()});
         }
