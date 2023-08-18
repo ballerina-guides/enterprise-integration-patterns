@@ -13,7 +13,7 @@ public function main() returns error? {
     // Reads file as stream containing 4kb chunk.
     stream<io:Block, io:Error?> fileStream = check io:fileReadBlocksAsStream("./resources/employee_names.txt", 4096);
 
-    map<string> req = {
+    map<string> s3Headers = {
         x\-amz\-acl: "private",
         x\-amz\-storage\-class: "STANDARD",
         x\-amz\-checksum\-algorithm: "CRC32",
@@ -22,17 +22,14 @@ public function main() returns error? {
 
     http:Request request = new;
 
-    foreach var [key, value] in req.entries() {
+    foreach var [key, value] in s3Headers.entries() {
         request.addHeader(key, value);    
     }
 
-    record {|io:Block value;|}|io:Error? chunk = fileStream.next();
-    while chunk !is io:Error {
-        if chunk is record {|io:Block value;|} {
-            request.setBinaryPayload(chunk.value);
+    check from io:Block chunk in fileStream
+        do {
+            request.setBinaryPayload(chunk);
             S3Response response = check s3Client->/uploads.post(request);
             io:println(response);
-        }
-        chunk = fileStream.next();
-    }
+        };
 }
