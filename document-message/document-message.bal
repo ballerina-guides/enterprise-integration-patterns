@@ -16,14 +16,14 @@ type ZohoResponse record {|
     |} details;
 |};
 
+final http:Client zohoClient = check new ("http://content.zohoapis.com.balmock.io");
+
 service /crm on new http:Listener(8080) {
     resource function post bulkUploadLeads(CsvRequest csvRequest) returns ZohoResponse|error {
         http:Request request = new;
         request.addHeader("X-CRM_ORG", csvRequest.org);
         request.addHeader("feature", "bulk-write");
         request.setFileAsPayload("./ftpincoming/" + csvRequest.filename, contentType = mime:MULTIPART_FORM_DATA);
-        
-        http:Client targetClient = check new ("http://content.zohoapis.com.balmock.io");
-        return targetClient->/crm/v5/upload.post(request);
+        return zohoClient->/crm/v5/upload.post(request);
     }
 }
