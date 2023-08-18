@@ -25,3 +25,6 @@ replay_pid*
 
 # Build Files
 target
+
+# Ballerina
+mock-http/Dependencies.toml
