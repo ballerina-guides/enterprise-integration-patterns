@@ -1,1 +1,1 @@
-GET http://localhost:9090/warehouse/stock&productId=1
+GET http://localhost:8080/warehouse/stock?parentId=12345678-abc&productId=87654321-dcba-4321-hgfe-123456789876
