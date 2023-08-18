@@ -27,4 +27,5 @@ replay_pid*
 target
 
 # Ballerina
+# Latest versions of dependencies will be used
 mock-http/Dependencies.toml
