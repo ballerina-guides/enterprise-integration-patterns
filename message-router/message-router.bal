@@ -25,7 +25,7 @@ enum Country {
     DE
 }
 
-http:Client dhl = check new ("http://api.dhl.com.balmock.io");
+final http:Client dhl = check new ("http://api.dhl.com.balmock.io");
 
 service /shipments on new http:Listener(8080) {
     
