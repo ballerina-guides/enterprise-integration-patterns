@@ -23,7 +23,7 @@ type StockResponse record {
     string CountryOfOrigin;
 };
 
-http:Client sapClient = check new("http://api.sap.com.balmock.io");
+final http:Client sapClient = check new("http://api.sap.com.balmock.io");
 
 service /warehouse on new http:Listener(8080) {
     
