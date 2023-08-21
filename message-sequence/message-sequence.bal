@@ -1,29 +1,26 @@
 import ballerina/io;
 import ballerina/http;
 
-type S3Response record {|
-    string x\-amz\-id;
-    string x\-amz\-request\-id;
-    string Date;
-    string ETag;
-|};
-
-const uploadId = "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeoSMLPRp8Z5o1u8feSRonpvnWsKKG35tI2LB9VDPiCgTy.Gq2VxQLYjrue4Nq.NBdqI";
 final http:Client s3Client = check new ("http://coral.s3.us.amazonaws.com.balmock.io");
 
 public function main() returns error? {
+    http:Response metaData = check s3Client->/employee_names.head();
+    float fileSize = check float:fromString((check metaData.getHeader("Content-Length")));
 
-    // Reads file as stream containing 4kb chunk.
-    stream<io:Block, io:Error?> fileStream = check io:fileReadBlocksAsStream("./resources/employee_names.txt", 4096);
-
-    http:Request request = new;
-
-    int partNumber = 1;
-    check from io:Block chunk in fileStream
-        do {
-            request.setBinaryPayload(chunk);
-            S3Response response = check s3Client->/uploadPart/[partNumber]/[uploadId].put(request);
-            partNumber += 1;
-            io:println(response);
-        };
+    int numberOfPackets = <int> float:ceiling(fileSize/10);
+    byte[] receivedData = [];
+    // Download the data part by part.
+    foreach int i in 0...numberOfPackets-1 {
+        http:Response s3Response = check s3Client->/employee_names.get(
+            headers = {
+                Range: string `bytes=${10 * i}-${10 * (i + 1) - 1}`
+            }
+        );
+        byte[]|error partData = s3Response.getBinaryPayload();
+        if partData is error || s3Response.statusCode != 200 {
+            break;
+        }
+        receivedData.push(...partData);
+    }
+    check io:fileWriteBytes("./resources/employee_names.txt", receivedData);
 }
