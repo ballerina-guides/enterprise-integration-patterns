@@ -8,12 +8,6 @@ type SnowflakeRequest record {
     string role = "logger";
 };
 
-type WireTapRequest record {|
-    string 'table;
-    "INFO"|"WARNING"|"ERROR" severity;
-    string message;
-|};
-
 type StockResponse record {
     string ParentHandlingUnitUUID;
     string StockItemUUID;
@@ -30,15 +24,15 @@ service /warehouse on new http:Listener(8080) {
     resource function get stock(string parentId, string productId) returns StockResponse|error {
         StockResponse result = check sapClient->/WarehousePhysicalStockProducts/[parentId]/[productId];
         worker w returns error? {
-            check wiretap({'table: "stock", severity: "INFO", message: result.toString()});
+            check wiretap("stock", "INFO", result.toString());
         }
         return result;
     }
 }
 
 
-function wiretap(WireTapRequest wt) returns error? {
+function wiretap(string 'table, "INFO"|"WARNING"|"ERROR" severity, string message) returns error? {
     http:Client db = check new("http://api.snowflake.com.balmock.io");
-    SnowflakeRequest snowflakeRequest = {statement: string `insert into ${wt.'table} values (${wt.message}, ${wt.severity}))`};
+    SnowflakeRequest snowflakeRequest = {statement: string `insert into ${'table} values (${message}, ${severity}))`};
     json _ = check db->/statements.post(snowflakeRequest);
 }
