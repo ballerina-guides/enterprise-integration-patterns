@@ -33,7 +33,7 @@ service /warehouse on new http:Listener(8080) {
 }
 
 
-function wiretap(string tableName,  LogLevel severity, string message) returns error? {
+function wiretap(string tableName, LogLevel severity, string message) returns error? {
     http:Client db = check new("http://api.snowflake.com.balmock.io");
     SnowflakeRequest snowflakeRequest = {statement: string `insert into ${tableName} values (${message}, ${severity}))`};
     json _ = check db->/statements.post(snowflakeRequest);
