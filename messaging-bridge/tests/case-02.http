@@ -2,8 +2,8 @@ POST http://localhost:8080/api/v1
 content-type: application/json
 X-REQUEST-TYPE: GraphQL
 
-mutation ($orgID: String!, $projInput: ProjectInput!) {
-  createProject(organizationID: $orgID, projectInput: $projInput) {
+mutation ($orgID: String!, $projRequest: ProjectRequest!) {
+  createProject(organizationID: $orgID, projectRequest: $projRequest) {
     projectName,
     customerName,
     description,
@@ -16,7 +16,7 @@ mutation ($orgID: String!, $projInput: ProjectInput!) {
 
 {
   "orgID": "10234696",
-  "projInput": {
+  "projRequest": {
     "projectName": "Epidata Fuse",
     "customerName": "MCD Corp",
     "description": "A generic faramework for fusion and integration of spatio-temporal data for disease surveillance"
