@@ -1,0 +1,5 @@
+tagline: Connect distinct messaging systems
+desc: The messaging bridge facilitates communication and data exchange between different messaging systems.
+helps: Ballerina offers a wide array of libraries designed to leverage different messaging protocols such as REST, GraphQL, gRPC, etc.
+tags: ["Messaging Bridge", "Message Channel", "Message Endpoint", "Channel Adapter"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingBridge.html
