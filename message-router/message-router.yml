@@ -1,0 +1,5 @@
+tagline: Route message to different output channels
+desc: A message router consumes a message and republishes it to a different message channel depending on a set of conditions.
+helps: Ballerina enables routing messages to different endpoints by reading the message and using basic control structures such as if and switch statements.
+tags: ["Message Router", "Message Channnel", "Message Endpoint"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageRouter.html
