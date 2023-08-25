@@ -1,0 +1,26 @@
+POST http://localhost:8080/avias/send
+
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Placemark>
+    <name>My Pin Location</name>
+    <description>This is a description of the pin location.</description>
+    <Point>
+      <coordinates>-74.0060,40.7128</coordinates>
+    </Point>
+  </Placemark>
+</kml>
+
+###
+POST http://localhost:8080/avias/receive
+
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-74.0060, 40.7128]
+  },
+  "properties": {
+    "name": "My Placemark"
+  }
+}
