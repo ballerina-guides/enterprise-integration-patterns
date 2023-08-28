@@ -18,9 +18,9 @@ service /engineering on new http:Listener(8080) {
 
         if dbResponse.hasHeader("x-message-history") {
             string dbHeader = check dbResponse.getHeader("x-message-history");
-            outbound.setHeader("x-message-history", dbHeader +", employee-endpoint");
+            outbound.setHeader("x-message-history", dbHeader +", engineering");
         } else {
-            outbound.setHeader("x-message-history", "employee-endpoint");
+            outbound.setHeader("x-message-history", "engineering");
         }
         return outbound;
     }
