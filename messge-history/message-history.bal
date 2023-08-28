@@ -1,7 +1,7 @@
 import ballerina/http;
 
 type ReimbursementRequest record {|
-    int employee_id;
+    string employee_id;
     string reason;
     string amount;
 |};
