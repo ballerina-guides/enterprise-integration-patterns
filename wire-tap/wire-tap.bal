@@ -19,10 +19,11 @@ type StockResponse record {
 
 type LogLevel "INFO"|"WARNING"|"ERROR";
 
-final http:Client sapClient = check new("http://api.sap.com.balmock.io");
+final http:Client sapClient = check new ("http://api.sap.com.balmock.io");
+final http:Client db = check new ("http://api.snowflake.com.balmock.io");
 
 service /warehouse on new http:Listener(8080) {
-    
+
     resource function get stock(string parentId, string productId) returns StockResponse|error {
         StockResponse result = check sapClient->/WarehousePhysicalStockProducts/[parentId]/[productId];
         worker w returns error? {
@@ -32,9 +33,7 @@ service /warehouse on new http:Listener(8080) {
     }
 }
 
-
 function wiretap(string tableName, LogLevel severity, string message) returns error? {
-    http:Client db = check new("http://api.snowflake.com.balmock.io");
     SnowflakeRequest snowflakeRequest = {statement: string `insert into ${tableName} values (${message}, ${severity}))`};
     json _ = check db->/statements.post(snowflakeRequest);
 }

@@ -1,5 +1,5 @@
-tagline: Send message to a secondory channel
-desc: Wire Tap publishes each incoming message to the main channel and as well as a secondary channel without modifying the message.
+tagline: Send a message to a secondary channel
+desc: Wire Tap publishes each incoming message to the main channel as well as a secondary channel without modifying the message.
 helps: Ballerina enables sending a message to a secondary channel without interrupting the flow of publishing to the main channel by using concurrency concepts such as workers.
 tags: ["Wire Tap", "Message Channel", "Message Endpoint"]
 link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/WireTap.html

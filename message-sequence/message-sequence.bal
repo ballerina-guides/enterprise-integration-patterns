@@ -1,5 +1,5 @@
-import ballerina/io;
 import ballerina/http;
+import ballerina/io;
 
 final http:Client s3Client = check new ("http://noname-tech.s3.amazonaws.com.balmock.io");
 
