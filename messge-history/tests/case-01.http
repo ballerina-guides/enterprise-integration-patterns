@@ -1,4 +1,4 @@
-POST http://localhost:8080/engineering/reimburse
+POST http://localhost:8080/finance/reimburse
 content-type: application/json
 
 {

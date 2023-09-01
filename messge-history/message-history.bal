@@ -6,22 +6,34 @@ type ReimbursementRequest record {|
     string amount;
 |};
 
-final http:Client dbClient = check new("http://api.internal-db.balmock.io");
+type traceId record {|
+    string traceId;
+    string status;
+|};
 
-service /engineering on new http:Listener(8080) {
+final http:Client internalClient = check new ("http://api.internal.balmock.io");
+final http:Client logClient = check new ("http://api.internal-log.balmock.io");
+const string HEADER = "x-message-history";
+
+service /finance on new http:Listener(8080) {
     resource function post reimburse(ReimbursementRequest request) returns http:Response|error {
-        http:Response dbResponse = check dbClient ->post("/reimbursements", request);
-    
+        http:Response response = check internalClient->post("/reimbursements", request);
         http:Response outbound = new;
-        outbound.setPayload(check dbResponse.getJsonPayload());
-        outbound.statusCode = dbResponse.statusCode;
+        outbound.setPayload(check response.getJsonPayload());
+        outbound.statusCode = response.statusCode;
 
-        if dbResponse.hasHeader("x-message-history") {
-            string dbHeader = check dbResponse.getHeader("x-message-history");
-            outbound.setHeader("x-message-history", dbHeader +", engineering");
+        string traceId = check logAndGetTraceId(request);
+        if response.hasHeader(HEADER) {
+            string financeHeader = check response.getHeader(HEADER);
+            outbound.setHeader(HEADER, financeHeader + ";" + traceId);
         } else {
-            outbound.setHeader("x-message-history", "engineering");
+            outbound.setHeader(HEADER, traceId);
         }
         return outbound;
     }
+}
+
+function logAndGetTraceId(anydata message) returns string|error {
+    traceId traceId = check logClient->post("/log_message", message);
+    return traceId.traceId;
 }
