@@ -6,14 +6,13 @@ type ReimbursementRequest record {|
     string amount;
 |};
 
-type traceId record {|
-    string traceId;
-    string status;
+type TraceId record {|
+    string id;
 |};
 
 final http:Client internalClient = check new ("http://api.internal.balmock.io");
 final http:Client logClient = check new ("http://api.internal-log.balmock.io");
-const string HEADER = "x-message-history";
+const string HISTORY_HEADER = "x-message-history";
 
 service /finance on new http:Listener(8080) {
     resource function post reimburse(ReimbursementRequest request) returns http:Response|error {
@@ -23,17 +22,17 @@ service /finance on new http:Listener(8080) {
         outbound.statusCode = response.statusCode;
 
         string traceId = check logAndGetTraceId(request);
-        if response.hasHeader(HEADER) {
-            string financeHeader = check response.getHeader(HEADER);
-            outbound.setHeader(HEADER, financeHeader + ";" + traceId);
+        if response.hasHeader(HISTORY_HEADER) {
+            string existingHeader = check response.getHeader(HISTORY_HEADER);
+            outbound.setHeader(HISTORY_HEADER, existingHeader + ";" + traceId);
         } else {
-            outbound.setHeader(HEADER, traceId);
+            outbound.setHeader(HISTORY_HEADER, traceId);
         }
         return outbound;
     }
 }
 
 function logAndGetTraceId(anydata message) returns string|error {
-    traceId traceId = check logClient->post("/log_message", message);
-    return traceId.traceId;
+    TraceId traceId = check logClient->post("/log_message", message);
+    return traceId.id;
 }
