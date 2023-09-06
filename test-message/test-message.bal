@@ -8,17 +8,14 @@ boolean healthy = true;
 service /customer on new http:Listener(8080) {
     private mysql:Client? db = null;
     function init() {
-	mysql:Client|error dbInit = new ("localhost", "admin", "adminpass", "CUSTOMER", 3000);
-        if dbInit is mysql:Client {
-            self.db = dbInit;
-        }
-        else {
-            healthy = false;
-        }
+        self.db = startConnection();
     }
 
     resource function get number(string id) returns string|http:InternalServerError|http:NotFound {
         mysql:Client? db = self.db;
+        if db == () {
+            self.db = startConnection();
+        }
         if db is mysql:Client {
             string|error result = db->queryRow(`SELECT number FROM customers WHERE id = ${id}`);
 
@@ -43,3 +40,12 @@ service /customer on new http:Listener(8080) {
     }
 }
 
+function startConnection() returns mysql:Client? {
+    mysql:Client|error dbInit = new ("localhost", "admin", "adminpass", "CUSTOMER", 3000);
+    if dbInit is mysql:Client {
+        healthy = true;
+        return dbInit;
+    }
+    healthy = false;
+    return;
+}
