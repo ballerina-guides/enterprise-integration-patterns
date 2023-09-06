@@ -35,7 +35,7 @@ service /customer on new http:Listener(8080) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-    resource function get hearbeat() returns http:Ok|http:InternalServerError {
+    resource function get heartbeat() returns http:Ok|http:InternalServerError {
         return healthy? http:OK : http:INTERNAL_SERVER_ERROR;
     }
 }
