@@ -8,7 +8,7 @@ boolean healthy = true;
 service /customer on new http:Listener(8080) {
     private mysql:Client? db = null;
     function init() {
-	    mysql:Client|error dbInit = new ("localhost", "admin", "adminpass", "CUSTOMER", 3000);
+	mysql:Client|error dbInit = new ("localhost", "admin", "adminpass", "CUSTOMER", 3000);
         if dbInit is mysql:Client {
             self.db = dbInit;
         }
