@@ -17,28 +17,30 @@ type Attendee record {|
     string number;
 |};
 
-final string fromNo = "+15005550006";
-final string twilioSID = "VAC1829a53d52f41b4b2b1cc003c0026aa8";
-final string  apiVersion = "2010-04-01";
+const FROM_NO = "+15005550006";
+const TWILIO_SID = "VAC1829a53d52f41b4b2b1cc003c0026aa8";
+const  API_VERSION = "2010-04-01";
+const CHARSET = "utf-8";
 
 final http:Client twilioClient = check new ("http://api.twilio.com.balmock.io");
 
-service /events on new http:Listener(8080) {
-    resource function post reminder(@http:Payload ReminderRequest request) returns error? {
-            error?[][] _ = from Event event in request.events
-            select from Attendee attendee in event.attendees
-            select sendMessage(attendee.name, event.eventName, request.date, attendee.number);
+service /api/v1 on new http:Listener(8080) {
+    resource function post reminders(ReminderRequest request) returns error? {
+        from Event event in request.events
+            do {
+                _ = from Attendee attendee in event.attendees
+                select sendReminder(attendee, event.eventName, request.date);
+            };
     }
 }
 
-function sendMessage(string name, string eventName, string date, string toNo) returns error?{
-    string body = "Hi " + name + ", looking forward to meet you at the " +
-                eventName + " on " + date;
+function sendReminder(Attendee attendee, string eventName, string date) returns error? {
+    string body = string `Hi ${attendee.name}, looking forward to meet you at the ${eventName} on ${date}`;
     http:Request twilioReq = new;
-    string payload = "From=" + check url:encode(fromNo, "utf-8") +
-                    "&To=" + check url:encode(toNo, "utf-8")  +
-                    "&Body=" + check url:encode(body, "utf-8");
+    string payload = "From=" + check url:encode(FROM_NO, CHARSET) +
+                     "&To=" + check url:encode(attendee.number, CHARSET)  +
+                     "&Body=" + check url:encode(body, CHARSET );
     twilioReq.setTextPayload(payload, contentType = mime:APPLICATION_FORM_URLENCODED);
-    http:Response _ = check twilioClient->
-            /[apiVersion]/Accounts/[twilioSID]/Messages\.json.post(twilioReq);
+    var _ = check twilioClient->
+            /[API_VERSION]/Accounts/[TWILIO_SID]/Messages\.json.post(twilioReq, targetType = http:Response);
 }
