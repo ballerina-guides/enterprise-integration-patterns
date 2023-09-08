@@ -1,12 +1,12 @@
 {
     "id": "0VF41793826897254",
-    "status": "CAPTURED",
+    "status": "PENDING",
     "amount": {
-    "value": "10.99",
-    "currency_code": "USD"
+        "value": "10.99",
+        "currency_code": "USD"
     },
     "payee": {
-    "email_address": "johnDoe@example.com",
-    "merchant_id": "6LMFBSH2R56HP"
+        "email_address": "johnDoe@example.com",
+        "merchant_id": "6LMFBSH2R56HP"
     }
 }

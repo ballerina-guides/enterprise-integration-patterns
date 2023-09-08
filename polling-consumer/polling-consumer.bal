@@ -5,37 +5,38 @@ enum Status {
     CREATED,
     CAPTURED,
     DENIED,
-    PARTIALLY_CAPTURED,
-    VOIDED,
     PENDING
 }
 
-type PaypalResponse record {
+type PaypalResponse record {|
     string id;
     Status status;
-    record {|
-        string value;
-        string currency_code;
-    |} amount;
-    record {|
-        string email_address;
-        string merchant_id;
-    |} payee;
-};
+    Amount amount;
+    Payee payee;
+|};
 
-const PAYMENT_ID = "0VF41793826897254";
+type Amount record {|
+    string value;
+    string currency_code;
+|};
+
+type Payee record {|
+    string email_address;
+    string merchant_id;
+|};
 
 final http:Client paypalClient = check new ("http://api-m.paypal.com.balmock.io");
 
 service /api/v1 on new http:Listener(8080) {
-    resource function get payment() returns string|error? {
-        while true {
-            PaypalResponse response = check paypalClient->/v2/payments/authorizations/[PAYMENT_ID]();
-            if response.status == CREATED || response.status == PARTIALLY_CAPTURED || response.status == PENDING {
-                runtime:sleep(5000);
+    resource function get payment(string paymentId) returns string|error {
+        foreach int i in 0...9 {
+            PaypalResponse response = check paypalClient->/v2/payments/authorizations/[paymentId]();
+            if response.status == CREATED || response.status == PENDING {
+                runtime:sleep(5);
             } else {
                 return response.status;
             }
         }
+        return error("Payment timed out");
     }
 }
