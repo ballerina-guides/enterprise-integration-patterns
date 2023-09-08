@@ -1,5 +1,5 @@
-tagline: 
-desc: 
-helps: 
-tags: 
-link: 
+tagline: Dynamically route messages
+desc: Dynamically route messages by a self-configurable router based on special configuration messages from participating destinations.
+helps: Ballerina provides map datastructures for maintaining routing tables and database connectors for persisting routing information.
+tags: ["Dynamic router", "Content based router", "Message router"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/DynamicRouter.html
