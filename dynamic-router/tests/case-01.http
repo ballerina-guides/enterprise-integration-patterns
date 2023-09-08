@@ -16,4 +16,4 @@ POST http://localhost:8080/bulbs/add_route
 
 ###
 
-GET http://localhost:8080/bulbs/2
+GET http://localhost:8080/bulbs/12/2
