@@ -2,7 +2,8 @@ POST http://localhost:8080/bulbs/add_route
 
 {
     "deviceId" : "EM54234",
-    "roomNo" : "12"
+    "roomNo" : "12",
+    "dimmable" : true
 }
 
 ###
@@ -11,9 +12,15 @@ POST http://localhost:8080/bulbs/add_route
 
 {
     "deviceId" : "EM12399",
-    "roomNo" : "15"
+    "roomNo" : "15",
+    "dimmable" : false
 }
 
 ###
 
-GET http://localhost:8080/bulbs/12/2
+POST http://localhost:8080/bulbs/switch
+
+{
+    "roomNo" : "15",
+    "state" : "DIM"
+}
