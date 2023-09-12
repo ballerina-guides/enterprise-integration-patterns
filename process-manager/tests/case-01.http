@@ -1,0 +1,19 @@
+POST http://localhost:8080/api/v1/process-manager
+
+{
+    "email": "bobNor@example.com",
+    "address": {
+    "firstName": "Bob",
+    "lastName": "Norman",
+    "address1": "Chestnut Street 92",
+    "phone": "+1(502)-459-2181",
+    "city": "Louisville",
+    "country": "United States"
+    },
+    "orderItems": [
+    {
+        "name": "Atomic Habits",
+        "quantity": 3
+    }
+    ]
+}
