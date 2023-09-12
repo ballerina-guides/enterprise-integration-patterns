@@ -3,7 +3,7 @@ import ballerina/mqtt;
 
 type RoutingEntry record {|
     string deviceId;
-    int roomNo;
+    readonly int roomNo;
     boolean dimmable;
 |};
 
@@ -19,12 +19,12 @@ enum State {
 }
 
 final http:Client deviceClient = check new ("http://api.devices.com.balmock.io");
-map<RoutingEntry> routingTable = {};
+table<RoutingEntry> key(roomNo) routingTable = table [];
 
 service /bulbs on new http:Listener(8080) {
 
     resource function post switch(SwitchRequest switchRequest) returns error? {
-        RoutingEntry? entry = routingTable[switchRequest.roomNo.toString()];
+        RoutingEntry? entry = routingTable[switchRequest.roomNo];
         if entry == () {
             return error("Invalid room");
         }
@@ -40,7 +40,7 @@ listener mqtt:Listener mqttSubscriber = check new (mqtt:DEFAULT_URL, "routermqtt
 service on mqttSubscriber {
     remote function onMessage(mqtt:Message message, mqtt:Caller caller) returns error? {
         RoutingEntry entry = check (check string:fromBytes(message.payload)).fromJsonStringWithType();
-        routingTable[entry.roomNo.toString()] = entry;
+        routingTable.put(entry);
         check caller->complete();
     }
 }

@@ -7,7 +7,7 @@ type RoutingEntry record {|
     boolean dimmable;
 |};
 
-mqtt:Client mqttClient = check new (mqtt:DEFAULT_URL, uuid:createType1AsString());
+final mqtt:Client mqttClient = check new (mqtt:DEFAULT_URL, uuid:createType1AsString());
 
 public function main() returns error? {
     RoutingEntry[] entries = [{deviceId: "EB23591", roomNo: 15, dimmable: false},
