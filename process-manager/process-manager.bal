@@ -35,48 +35,42 @@ type OrderItemResponse record {|
     string currencyCode;
 |};
 
-type ShippingRequest record {|
-    DeclaredValue declaredValue;
-    Shipper shipper;
-|};
-
-type Shipper record {|
-    ShipperAddress address;
-    ShipperContact contact;
-|};
-
-type DeclaredValue record {|
+type dhlRequest record {|
     float amount;
     string currency;
+    string personName;
+    string email;
+    dhlAddress address;
 |};
 
-type ShipperAddress record {|
+type fedexRequest record {|
+    float amount;
+    string currency;
+    string personName;
+    string email;
+    string phoneNumber;
+    fedexAddress address;
+|};
+
+type fedexAddress record {|
     string address1;
     string city;
     string country;
 |};
 
-type ShipperContact record {|
-    string personName;
+type dhlAddress record {|
+    string name;
     string email;
-    string phoneNumber;
+    string address1;
+    string city;
+    string country;
 |};
 
 type MailRequest record {|
-    MailInfo toInfo;
-    MailInfo fromInfo;
+    string toInfo;
+    string fromInfo;
     string subject;
-    MailContent content;
-|};
-
-type MailInfo record {|
-    string email;
-    string name;
-|};
-
-type MailContent record {|
-    string contentType;
-    string value;
+    string content;
 |};
 
 final http:Client shopify = check new ("http://BlackwellsBooks.myshopify.com.balmock.io");
@@ -85,55 +79,61 @@ final http:Client fedEx = check new ("http://api.fedex.com.balmock.io");
 final http:Client sendgrid = check new ("http://api.sendgrid.com.balmock.io");
 
 service /api/v1 on new http:Listener(8080) {
-    resource function post process\-manager(OrderRequest request) returns error? {
+    resource function post orders(OrderRequest request) returns error? {
         OrderResponse response = check shopify->/admin/api/orders\.json.post(request);
-        check createShipment(response);
+        if response.address.country == "United States" {
+            check createFedexShipment(response);
+        } else {
+            check creeateDhlShipment(response);
+        }
         check sendConfirmationMail(response.address.firstName, response.email);
     }
 }
 
-function createShipment(OrderResponse orderDetails) returns error? {
-    ShippingRequest shippingReq = {
-        declaredValue: {
-            amount: orderDetails.total,
-            currency: orderDetails.currency
-        },
-        shipper: {
-            address: {
-                address1: orderDetails.address.address1,
-                city: orderDetails.address.city,
-                country: orderDetails.address.country
-            },
-            contact: {
-                personName: orderDetails.address.firstName + " " + orderDetails.address.lastName,
-                email: orderDetails.email,
-                phoneNumber: orderDetails.address.phone
-            }
+function createFedexShipment(OrderResponse response) returns error? {
+    fedexRequest fedexReq = {
+        amount: response.total,
+        currency: response.currency,
+        personName: response.address.firstName + " " + response.address.lastName,
+        email: response.email,
+        phoneNumber: response.address.phone,
+        address: {
+            address1: response.address.address1,
+            city: response.address.city,
+            country: response.address.country
         }
     };
-    if orderDetails.address.country == "United States" { //Domestic delivery
-        _ = check fedEx->/api/en\-us/catalog/ship/v1/shipments.post(shippingReq, targetType = json);
-    } else { //International delivery
-        _ = check dhlExpress->/mydhlapi/shipments.post(shippingReq, targetType = json);
-    }
+
+    _ = check fedEx->/api/en\-us/catalog/ship/v1/shipments.post(fedexReq, targetType = json);
+
+}
+
+function creeateDhlShipment(OrderResponse response) returns error? {
+    dhlRequest dhlReq = {
+        amount: response.total,
+        currency: response.currency,
+        personName: response.address.firstName,
+        email: response.email,
+        address: {
+            name: response.address.firstName + " " + response.address.lastName,
+            email: response.email,
+            address1: response.address.address1,
+            city: response.address.city,
+            country: response.address.country
+        }
+    };
+
+    _ = check dhlExpress->/mydhlapi/shipments.post(dhlReq, targetType = json);
 }
 
 function sendConfirmationMail(string name, string email) returns error? {
     string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped.</p>`;
     MailRequest mailReq = {
-        toInfo: {
-            email: email,
-            name: name
-        },
-        fromInfo: {
-            email: "orders@blackwell.com",
-            name: "Blackwell's Books"
-        },
+        toInfo: email,
+        fromInfo: "orders@blackwell.com",
         subject: "Order Confirmation",
-        content: {
-            contentType: "text/html",
-            value: body
-        }
+        content: body
     };
+
     _ = check sendgrid->/v3/mail/send.post(mailReq, targetType = json);
 }
