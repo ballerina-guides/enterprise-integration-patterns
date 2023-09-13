@@ -33,17 +33,19 @@ final http:Client quickBooks = check new ("http://api.quickbooks.com.balmock.io"
 service /api/v1/analytics on new http:Listener(8080) {
     
     resource function post sales(SalesData salesData) returns error? {
-        QuickBooksInvoice quickBooksInvoice = transform(salesData);
+        QuickBooksInvoice quickBooksInvoice = translate(salesData);
         _ = check quickBooks->/v3/company/REALM012/invoice.post(quickBooksInvoice, targetType = http:Response);
     }
 }
 
-function transform(SalesData salesData) returns QuickBooksInvoice => {
-   customerId: salesData.customer.id,
-   invoices: from var oppotunity in salesData.opportunities
-             select {
-                 id: oppotunity.id,
-                 amount: oppotunity.amount,
-                 invoiceDate: oppotunity.closeDate
-             }
-};
+function translate(SalesData salesData) returns QuickBooksInvoice {
+   return {
+        customerId: salesData.customer.id,
+        invoices: from var oppotunity in salesData.opportunities
+                select {
+                    id: oppotunity.id,
+                    amount: oppotunity.amount,
+                    invoiceDate: oppotunity.closeDate
+                }
+    };
+}

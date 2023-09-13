@@ -21,5 +21,5 @@ service /api on new http:Listener(8080) {
 }
 
 function storeAddress(string address, GeoCodeResponse geocode) returns error? {
-    json _ = check firebaseClient->/location/[address]/location\.json.put(geocode);
+    _ = check firebaseClient->/location/[address]/location\.json.put(geocode, targetType = json);
 }
