@@ -24,9 +24,9 @@ service /api/v1 on new http:Listener(8080) {
         string body = string `Incident ${req.incident.description} reported: 
                               ${req.incident.date} at ${req.incident.time}.`;
         http:Request twilioReq = new;
-        string payload = string `From=${check url:encode(FROM_NO, "utf-8")}
-                                 &To=${check url:encode(req.phoneNo, "utf-8")}
-                                 &Body=${check url:encode(body, "utf-8")}}`;
+        string payload = string `From=${check url:encode(FROM_NO, "utf-8")}` +
+                         string `&To=${check url:encode(req.phoneNo, "utf-8")}` +
+                         string `&Body=${check url:encode(body, "utf-8")}}`;
         twilioReq.setTextPayload(payload, contentType = mime:APPLICATION_FORM_URLENCODED);
         _ = check twilio->/[API_VERSION]/Accounts/[TWILIO_SID]/Messages\.json.post(twilioReq,
             targetType = http:Response);

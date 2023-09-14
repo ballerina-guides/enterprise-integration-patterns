@@ -12,6 +12,7 @@ type OrderResponse record {|
     float total;
     Address address;
     OrderItemResponse[] orderItems;
+    string trackingNumber;
 |};
 
 type Address record {|
@@ -67,7 +68,7 @@ service /api/v1 on new http:Listener(8080) {
         } else {
             check creeateDhlShipment(response);
         }
-        var _ = start sendConfirmationMail(response.address.fullName, response.email);
+        var _ = start sendConfirmationMail(response.address.fullName, response.email, response.trackingNumber);
     }
 }
 
@@ -107,8 +108,9 @@ function creeateDhlShipment(OrderResponse response) returns error? {
     _ = check dhlExpress->/mydhlapi/shipments.post(dhlReq, targetType = json);
 }
 
-function sendConfirmationMail(string name, string email) returns error? {
-    string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped.</p>`;
+function sendConfirmationMail(string name, string email, string trackingNumber) returns error? {
+    string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped. ` +
+                  string `Track your order using ${trackingNumber}</p>`;
     var mailReq = {
         toInfo: email,
         fromInfo: "orders@blackwell.com",

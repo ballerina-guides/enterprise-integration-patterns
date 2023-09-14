@@ -1,7 +1,7 @@
 POST http://localhost:8080/api/v1/incidents
 
 {
-  "number": "+94749933244",
+  "phoneNo": "+94749933244",
   "incident": {
       "description": "System breakdown",
       "date": "2023-10-10",
@@ -14,7 +14,7 @@ POST http://localhost:8080/api/v1/incidents
 POST http://localhost:8080/api/v1/incidents
 
 {
-  "number": "+94784434456",
+  "phoneNo": "+94784434456",
   "incident": {
       "description": "Rate exceeded",
       "date": "2023-10-11",
@@ -27,7 +27,7 @@ POST http://localhost:8080/api/v1/incidents
 POST http://localhost:8080/api/v1/incidents
 
 {
-  "number": "+94785734245",
+  "phoneNo": "+94785734245",
   "incident": {
       "description": "Bug in application",
       "date": "2023-10-13",
