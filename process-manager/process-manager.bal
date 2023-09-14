@@ -15,8 +15,7 @@ type OrderResponse record {|
 |};
 
 type Address record {|
-    string firstName;
-    string lastName;
+    string fullName;
     string address1;
     string phone;
     string city;
@@ -24,53 +23,35 @@ type Address record {|
 |};
 
 type OrderItemRequest record {
-    string name;
+    string itemName;
     int quantity;
 };
 
 type OrderItemResponse record {|
-    string name;
+    string itemName;
     int quantity;
     float price;
     string currencyCode;
 |};
 
-type dhlRequest record {|
+type ShipmentRequest record {|
     float amount;
     string currency;
     string personName;
     string email;
-    dhlAddress address;
+    DHLAddress|FedexAddress address;
 |};
 
-type fedexRequest record {|
-    float amount;
-    string currency;
-    string personName;
-    string email;
+type FedexAddress record {|
+    string address1;
+    string city;
+    string country;
     string phoneNumber;
-    fedexAddress address;
 |};
 
-type fedexAddress record {|
-    string address1;
-    string city;
-    string country;
-|};
-
-type dhlAddress record {|
+type DHLAddress record {|
     string name;
-    string email;
-    string address1;
-    string city;
-    string country;
-|};
-
-type MailRequest record {|
-    string toInfo;
-    string fromInfo;
-    string subject;
-    string content;
+    *FedexAddress;
 |};
 
 final http:Client shopify = check new ("http://BlackwellsBooks.myshopify.com.balmock.io");
@@ -79,28 +60,28 @@ final http:Client fedEx = check new ("http://api.fedex.com.balmock.io");
 final http:Client sendgrid = check new ("http://api.sendgrid.com.balmock.io");
 
 service /api/v1 on new http:Listener(8080) {
-    resource function post orders(OrderRequest request) returns error? {
-        OrderResponse response = check shopify->/admin/api/orders\.json.post(request);
+    resource function post orders(OrderRequest orderReq) returns error? {
+        OrderResponse response = check shopify->/admin/api/orders\.json.post(orderReq);
         if response.address.country == "United States" {
             check createFedexShipment(response);
         } else {
             check creeateDhlShipment(response);
         }
-        check sendConfirmationMail(response.address.firstName, response.email);
+        var _ = start sendConfirmationMail(response.address.fullName, response.email);
     }
 }
 
 function createFedexShipment(OrderResponse response) returns error? {
-    fedexRequest fedexReq = {
+    ShipmentRequest fedexReq = {
         amount: response.total,
         currency: response.currency,
-        personName: response.address.firstName + " " + response.address.lastName,
+        personName: response.address.fullName,
         email: response.email,
-        phoneNumber: response.address.phone,
         address: {
             address1: response.address.address1,
             city: response.address.city,
-            country: response.address.country
+            country: response.address.country,
+            phoneNumber: response.address.phone
         }
     };
 
@@ -109,17 +90,17 @@ function createFedexShipment(OrderResponse response) returns error? {
 }
 
 function creeateDhlShipment(OrderResponse response) returns error? {
-    dhlRequest dhlReq = {
+    ShipmentRequest dhlReq = {
         amount: response.total,
         currency: response.currency,
-        personName: response.address.firstName,
+        personName: response.address.fullName,
         email: response.email,
         address: {
-            name: response.address.firstName + " " + response.address.lastName,
-            email: response.email,
+            name: response.address.fullName,
             address1: response.address.address1,
             city: response.address.city,
-            country: response.address.country
+            country: response.address.country,
+            phoneNumber: response.address.phone
         }
     };
 
@@ -128,7 +109,7 @@ function creeateDhlShipment(OrderResponse response) returns error? {
 
 function sendConfirmationMail(string name, string email) returns error? {
     string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped.</p>`;
-    MailRequest mailReq = {
+    var mailReq = {
         toInfo: email,
         fromInfo: "orders@blackwell.com",
         subject: "Order Confirmation",
