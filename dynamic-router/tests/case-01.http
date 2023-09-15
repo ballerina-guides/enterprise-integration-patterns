@@ -2,7 +2,7 @@ POST http://localhost:8080/bulbs/switch
 
 {
     "roomNo" : 15,
-    "state" : "DIM"
+    "state" : "OFF"
 }
 
 ###
@@ -11,7 +11,7 @@ POST http://localhost:8080/bulbs/switch
 
 {
     "roomNo" : 9,
-    "state" : "DIM"
+    "state" : "ON"
 }
 
 ###

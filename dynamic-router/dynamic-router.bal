@@ -4,7 +4,6 @@ import ballerina/mqtt;
 type RoutingEntry record {|
     string deviceId;
     readonly int roomNo;
-    boolean dimmable;
 |};
 
 type SwitchRequest record {|
@@ -14,8 +13,7 @@ type SwitchRequest record {|
 
 enum State {
     ON,
-    OFF,
-    DIM
+    OFF
 }
 
 final mqtt:Client mqttClient = check new (mqtt:DEFAULT_URL, "routermqttclient");
@@ -27,9 +25,6 @@ service /bulbs on new http:Listener(8080) {
         RoutingEntry? entry = routingTable[switchRequest.roomNo];
         if entry == () {
             return error("Invalid room");
-        }
-        if switchRequest.state == DIM && !entry.dimmable {
-            return error("Bulb is not dimmable");
         }
         check mqttClient->publish("bulb/" + entry.deviceId, {payload: switchRequest.state.toBytes()});
     }
