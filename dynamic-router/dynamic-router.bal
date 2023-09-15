@@ -18,7 +18,7 @@ enum State {
     DIM
 }
 
-final http:Client deviceClient = check new ("http://api.devices.com.balmock.io");
+final mqtt:Client mqttClient = check new (mqtt:DEFAULT_URL, "routermqttclient");
 table<RoutingEntry> key(roomNo) routingTable = table [];
 
 service /bulbs on new http:Listener(8080) {
@@ -31,7 +31,7 @@ service /bulbs on new http:Listener(8080) {
         if switchRequest.state == DIM && !entry.dimmable {
             return error("Bulb is not dimmable");
         }
-        json _ = check deviceClient->/[entry.deviceId]/[switchRequest.state];
+        check mqttClient->publish("bulb/" + entry.deviceId, {payload: switchRequest.state.toBytes()});
     }
 }
 
