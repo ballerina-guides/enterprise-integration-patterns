@@ -1,5 +1,5 @@
 tagline: Transfer data to another application
-desc: The document message reliably transfers data from one application to another.
-helps: Ballerina supports a wide range of libraries for handling various messaging protocols, including REST, GraphQL, gRPC, and more. Moreover, it is equipped to handle a diverse array of MIME type attachments. The HTTP client ensures reliability through multiple ways, such as load balancing, circuit breaking, and a retry mechanism. Similarly, other protocols also provide various mechanisms.
-tags: ["Document Message", "Message Channnel", "Message Endpoint"]
+desc: The document message transfers data from one application to another. The focus is on the data and reliability, not on the timing of the transfer.
+helps: Ballerina supports sending and receiving data in multiple formats such as JSON and XML over different protocols such as HTTP, GRPC, Kafka, etc. Depending on the protocol, Ballerina provides different reliability mechanisms. As an example, the Ballerina HTTP client supports retries, load balancing, and circuit breaking.
+tags: ["Document Message", "Message Channel", "Message Endpoint", "Point-to-Point Channel", "Request-Reply"]
 link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/DocumentMessage.html
