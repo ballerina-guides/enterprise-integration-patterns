@@ -1,0 +1,11 @@
+// Step 1: Setup expiration time
+POST http://localhost:8080/storage/setUp
+
+{
+    "initializedTime": "2023-09-14T17:14:52.283210Z",
+    "expiration": 10
+}
+
+###
+// Step 2: Download image
+GET http://localhost:8080/storage/image?fileName=logo.png
