@@ -8,14 +8,18 @@ type OcrResponse record {|
     string pdfUrl;
 |};
 
+final string[] ocrProcessors = ["processor1", "processor2", "processor3"];
+
 service / on new http:Listener(8080) {
-    string[] ocrProcessors = ["processor1", "processor2", "processor3"];
     int processorNo = 0;
 
     resource function get ocr(string url) returns OcrResponse|error {
-        int currentProcessor = self.processorNo;
-        self.processorNo = currentProcessor == 2 ? 0 : currentProcessor + 1;
-        string processorId = self.ocrProcessors[currentProcessor];
+        int currentProcessor;
+        lock {
+            currentProcessor = self.processorNo;
+            self.processorNo = currentProcessor == 2 ? 0 : currentProcessor + 1;
+        }
+        string processorId = ocrProcessors[currentProcessor];
         return check ocrClient->/[processorId]/parse/imageurl(url = url);
     }
 }
