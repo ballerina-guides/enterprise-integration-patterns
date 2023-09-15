@@ -16,13 +16,13 @@ map<OrderStatus> orderStatuses = {};
 
 service /api/v1 on new http:Listener(8080) {
 
-    resource function put manage\-orders(OrderDetail orderDetail) returns
+    resource function put manage\-orders/[string orderId](OrderDetail orderDetail) returns
         http:STATUS_ACCEPTED|http:STATUS_ALREADY_REPORTED {
-        OrderStatus? orderStatus = orderStatuses[orderDetail.orderId];
-        if orderStatus != null && orderStatus == orderDetail.status {
+        OrderStatus? orderStatus = orderStatuses[orderId];
+        if orderStatus == orderDetail.status {
             return http:STATUS_ALREADY_REPORTED;
         } else {
-            orderStatuses[orderDetail.orderId] = orderDetail.status;
+            orderStatuses[orderId] = orderDetail.status;
             return http:STATUS_ACCEPTED;
         }
     }
