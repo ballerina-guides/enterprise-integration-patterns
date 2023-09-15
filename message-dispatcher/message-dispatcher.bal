@@ -8,12 +8,12 @@ type OcrResponse record {|
     string pdfUrl;
 |};
 
-final string[] ocrProcessors = ["processor1", "processor2", "processor3"];
+final readonly & string[] ocrProcessors = ["processor1", "processor2", "processor3"];
 
 service / on new http:Listener(8080) {
     int processorNo = 0;
 
-    resource function get ocr(string url) returns OcrResponse|error {
+    isolated resource function get ocr(string url) returns OcrResponse|error {
         int currentProcessor;
         lock {
             currentProcessor = self.processorNo;
