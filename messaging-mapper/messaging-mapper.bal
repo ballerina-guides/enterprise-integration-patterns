@@ -19,7 +19,7 @@ public type Invoice record {|
     decimal total;
 |};
 
-table<Invoice> key(invoiceId) invoices = table [];
+final table<Invoice> key(invoiceId) invoices = table [];
 
 service /api/v1 on new graphql:Listener(8080) {
 

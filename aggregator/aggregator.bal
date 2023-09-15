@@ -1,6 +1,6 @@
 import ballerina/http;
 
-map<json[]> partialSurveys = {};
+final map<json[]> partialSurveys = {};
 
 final http:Client formSubmitClient = check new ("http://api.survayme.com.balmock.io");
 

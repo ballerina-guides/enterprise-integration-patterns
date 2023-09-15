@@ -12,7 +12,7 @@ type TraceId record {|
 
 final http:Client internalClient = check new ("http://api.internal.balmock.io");
 final http:Client logClient = check new ("http://api.internal-log.balmock.io");
-const string HISTORY_HEADER = "x-message-history";
+const HISTORY_HEADER = "x-message-history";
 
 service /finance on new http:Listener(8080) {
     resource function post reimburse(ReimbursementRequest request) returns http:Response|error {
