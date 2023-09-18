@@ -10,7 +10,7 @@ const TEAM_LEAD = 1;
 const MANAGER = 2;
 const SENIOR_MANAGER = 3;
 
-map<Approval[]> incompleteApprovals = {};
+final map<Approval[]> incompleteApprovals = {};
 
 final http:Client hrClient = check new ("http://api.wso2hr.com.balmock.io");
 
