@@ -72,7 +72,7 @@ final http:Client sendgrid = check new ("http://api.sendgrid.com.balmock.io");
 service /api/v1 on new http:Listener(8080) {
     resource function post orders(OrderRequest orderReq) returns error? {
         OrderResponse response = check shopify->/admin/api/orders\.json.post(orderReq);
-        string trackingNumber = "";
+        string trackingNumber;
         if response.address.country == "United States" {
             FedexResponse fedexResp = check createFedexShipment(response);
             trackingNumber = fedexResp.trackingNumber;
