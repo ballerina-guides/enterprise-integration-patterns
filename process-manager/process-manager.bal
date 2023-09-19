@@ -12,6 +12,7 @@ type OrderResponse record {|
     float total;
     Address address;
     OrderItemResponse[] orderItems;
+    string trackingNumber;
 |};
 
 type Address record {|
@@ -54,6 +55,15 @@ type DHLAddress record {|
     *FedexAddress;
 |};
 
+type FedexResponse record {|
+    string transactionId;
+    string trackingNumber;
+|};
+
+type DHLResponse record {|
+    string trackingNumber;
+|};
+
 final http:Client shopify = check new ("http://BlackwellsBooks.myshopify.com.balmock.io");
 final http:Client dhlExpress = check new ("http://express.api.dhl.com.balmock.io");
 final http:Client fedEx = check new ("http://api.fedex.com.balmock.io");
@@ -62,16 +72,19 @@ final http:Client sendgrid = check new ("http://api.sendgrid.com.balmock.io");
 service /api/v1 on new http:Listener(8080) {
     resource function post orders(OrderRequest orderReq) returns error? {
         OrderResponse response = check shopify->/admin/api/orders\.json.post(orderReq);
+        string trackingNumber;
         if response.address.country == "United States" {
-            check createFedexShipment(response);
+            FedexResponse fedexResp = check createFedexShipment(response);
+            trackingNumber = fedexResp.trackingNumber;
         } else {
-            check creeateDhlShipment(response);
+            DHLResponse dhlResp = check creeateDhlShipment(response);
+            trackingNumber = dhlResp.trackingNumber;
         }
-        var _ = start sendConfirmationMail(response.address.fullName, response.email);
+        var _ = start sendConfirmationMail(response.address.fullName, response.email, trackingNumber);
     }
 }
 
-function createFedexShipment(OrderResponse response) returns error? {
+function createFedexShipment(OrderResponse response) returns FedexResponse|error {
     ShipmentRequest fedexReq = {
         amount: response.total,
         currency: response.currency,
@@ -85,11 +98,11 @@ function createFedexShipment(OrderResponse response) returns error? {
         }
     };
 
-    _ = check fedEx->/api/en\-us/catalog/ship/v1/shipments.post(fedexReq, targetType = json);
+    return check fedEx->/api/en\-us/catalog/ship/v1/shipments.post(fedexReq);
 
 }
 
-function creeateDhlShipment(OrderResponse response) returns error? {
+function creeateDhlShipment(OrderResponse response) returns DHLResponse|error {
     ShipmentRequest dhlReq = {
         amount: response.total,
         currency: response.currency,
@@ -104,11 +117,12 @@ function creeateDhlShipment(OrderResponse response) returns error? {
         }
     };
 
-    _ = check dhlExpress->/mydhlapi/shipments.post(dhlReq, targetType = json);
+    return check dhlExpress->/mydhlapi/shipments.post(dhlReq);
 }
 
-function sendConfirmationMail(string name, string email) returns error? {
-    string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped.</p>`;
+function sendConfirmationMail(string name, string email, string trackingNumber) returns error? {
+    string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped. ` +
+                  string `Track your order using ${trackingNumber}</p>`;
     var mailReq = {
         toInfo: email,
         fromInfo: "orders@blackwell.com",
