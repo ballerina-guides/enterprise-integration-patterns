@@ -4,15 +4,22 @@ const PROJECT_ID = "LAND-TEST04";
 const DATASET_ID = "f57074a0-a8b6-403e-9df1-e9fc46";
 
 final http:Client gMapClient = check new ("http://mapsplatformdatasets.googleapis.com.balmock.io");
+final http:Client microsoftClient = check new ("http://atlas.microsoft.com.balmock.io");
 
-enum TARGET_TYPE {
-    KML,
-    GEOJSON
-}
+type Gpx xml;
+
+type Kml xml;
+
+type Csv record {|
+    float X;
+    float Y;
+    string Name;
+    string Description;
+|}[];
 
 type GeoJson record {
     string 'type = "FeatureCollection";
-    string name;
+    string name = "PlaceMarks";
     Feature[] features;
 };
 
@@ -36,123 +43,96 @@ type GMapResponse record {
     string createTime;
 };
 
-service /api on new http:Listener(8080) {
-    resource function post uploadCsvDataToGMap(string[][] data) returns GMapResponse|error? {
-        xml|GeoJson kmlData = check canonicalDataModel(data, KML);
-        if kmlData is GeoJson {
-            return error("Unsupported target type");
-        }
+type MicrosoftMapResponse record {
+    string formatVersion;
+    record {
+        record {
+            string latitude;
+            string longitude;
+        }[] points;
+    }[] routes;
+};
+
+service /map on new http:Listener(8080) {
+    resource function post uploadPlaceMarks(http:Request request) returns GMapResponse|error? {
+        Csv|Gpx data = check getPayload(request);
+        GeoJson geoJson = convertToCanonical(data);
+        Kml kmlData = convertFromCanonicalToKml(geoJson);
         GMapResponse gMapResponse = check gMapClient->post(
-            string `v1/projects/${PROJECT_ID}/datasets/${DATASET_ID}:import`, kmlData);
+            string `/v1/projects/${PROJECT_ID}/datasets/${DATASET_ID}:import`, kmlData);
         return gMapResponse;
     }
 
-    resource function post uploadGpxDataToGMap(xml data) returns GMapResponse|error? {
-        xml|GeoJson kmlData = check canonicalDataModel(data, KML);
-        if kmlData is GeoJson {
-            return error("Unsupported target type");
-        }
-        GMapResponse gMapResponse = check gMapClient->post(
-            string `v1/projects/${PROJECT_ID}/datasets/${DATASET_ID}:import`, kmlData);
-        return gMapResponse;
+    resource function post getRouteDirection(http:Request request, string query) returns MicrosoftMapResponse|error {
+        Csv|Gpx data = check getPayload(request);
+        GeoJson geoJson = convertToCanonical(data);
+        MicrosoftMapResponse microsoftMapResponse = check microsoftClient->/route/directions/'json.post(
+            {"supportingPoints": geoJson.toJson()}, {query: string `${query}`}
+        );
+        return microsoftMapResponse;
     }
 }
 
-isolated function canonicalDataModel(anydata data, string targetType) returns xml|GeoJson|error {
-    GeoJson canonicalJsonRepresentation;
-    match targetType {
-        "KML" => {
-            if data is string[][] {
-                canonicalJsonRepresentation = convertFromCsvToGeoJson(data);
-            } else if data is xml {
-                canonicalJsonRepresentation = convertFromGpxToGeoJson(data);
-            } else {
-                return error("Unsupported source type");
-            }
-            return convertFromGeoJsonToKml(canonicalJsonRepresentation);
-        }
-        "GEOJSON" => {
-            if data is string[][] {
-                canonicalJsonRepresentation = convertFromCsvToGeoJson(data);
-            } else if data is xml {
-                canonicalJsonRepresentation = convertFromGpxToGeoJson(data);
-            } else {
-                return error("Unsupported source type");
-            }
-            return canonicalJsonRepresentation;
-        }
-        _ => {
-            return error("Unsupported target type");
-        }
+isolated function convertToCanonical(Csv|Gpx data) returns GeoJson {
+    if data is Csv {
+        return convertFromCsvToCanonical(data);
+    } else {
+        return convertFromGpxToCanonical(data);
     }
 }
 
-isolated function convertFromCsvToGeoJson(string[][] data) returns GeoJson {
-    GeoJson geoJsonData = {
-        'type: "FeatureCollection",
-        name: "Placemarks",
-        features: []
+isolated function getPayload(http:Request request) returns Csv|Gpx|error {
+    if request.getContentType().includes("xml") {
+        return request.getXmlPayload();
+    }
+    json data = check request.getJsonPayload();
+    return data.cloneWithType(Csv);
+}
+
+isolated function convertFromCsvToCanonical(Csv data) returns GeoJson {
+    return {
+        features: from var member in data
+                    let string X = member.X.toString(), string Y = member.Y.toString()
+                    select {
+                        properties: {X, Y, Name: member.Name, description: member.Description},
+                        geometry: {coordinates: [X, Y]}
+                    }
     };
-
-    foreach [int, string[]] [i, element] in data.enumerate() {
-        if i == 0 {
-            continue;
-        }
-        geoJsonData.features[i - 1] = {
-            properties: {X: element[0], Y: element[1], Name: element[2], description: element[3]},
-            geometry: {coordinates: [element[0], element[1]]}
-        };
-    }
-    return geoJsonData;
 }
 
-isolated function convertFromGpxToGeoJson(xml gpxData) returns GeoJson {
-    GeoJson geoJsonData = {
-        'type: "FeatureCollection",
-        name: "Placemarks",
-        features: []
+isolated function convertFromGpxToCanonical(Gpx gpxData) returns GeoJson {
+    return {
+        features: from var extension in gpxData/**/<extensions>
+            select {
+                properties: {
+                    X: (extension/**/<X>).data(),
+                    Y: (extension/**/<X>).data(),
+                    Name: (extension/**/<Name>).data(),
+                    description: (extension/**/<description>).data()
+                },
+                geometry: {coordinates: [(extension/**/<X>).data(), (extension/**/<Y>).data()]}
+            }
     };
-
-    int i = 0;
-    foreach xml extension in gpxData/**/<extensions> {
-        string coordinateX = (extension/**/<X>).data();
-        string coordinateY = (extension/**/<Y>).data();
-        geoJsonData.features[i] = {
-            properties: {
-                X: coordinateX,
-                Y: coordinateY,
-                Name: (extension/**/<Name>).data(),
-                description: (extension/**/<description>).data()
-            },
-            geometry: {coordinates: [coordinateX, coordinateY]}
-        };
-        i += 1;
-    }
-    return geoJsonData;
 }
 
-isolated function convertFromGeoJsonToKml(GeoJson geoJsonData) returns xml|error {
-    xml kmlData = xml `<?xml version="1.0" encoding="UTF-8"?>`;
-    xml:Element kmlElement = xml `<kml>
-    </kml>`;
-    xml:Element docElement = xml `<Document>
+isolated function convertFromCanonicalToKml(GeoJson geoJson) returns Kml {
+    xml kmlData = xml `<kml>
+        <Document>
             <Schema id="temp">
                 <SimpleField name="X" type="double"/>
                 <SimpleField name="Y" type="double"/>
                 <SimpleField name="Name" type="string"/>
             </Schema>
-        </Document>`;
-
-    foreach Feature feature in geoJsonData.features {
-        xml placeMark = xml `
-            <Placemark>
-                <description>${feature.properties.description}</description>
-                <Point><coordinates>${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}</coordinates></Point>
-            </Placemark>
-        `;
-        xml e = docElement.getChildren() + placeMark;
-        xml:setChildren(docElement, e);
-    }
-    kmlElement.setChildren(docElement);
-    return xml:concat(kmlData, kmlElement);
+            ${from Feature feature in geoJson.features
+            select xml `<Placemark>
+                    <description>${feature.properties.description}</description>
+                    <Point>
+                        <coordinates>
+                            ${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}
+                        </coordinates>
+                    </Point>
+                </Placemark>`}
+            </Document>
+        </kml>`;
+    return kmlData;
 }
