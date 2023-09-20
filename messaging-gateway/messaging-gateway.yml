@@ -1,0 +1,5 @@
+tagline: Encapsulates the messaging from the application
+desc: Messaging Gateway wraps messaging specific method calls and expose domain specific methods to the application.
+helps: Ballerinas' classes and modules helps to create wrappers and expose domain specifc functions and methods.
+tags: ["Messaging Gateway"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html
