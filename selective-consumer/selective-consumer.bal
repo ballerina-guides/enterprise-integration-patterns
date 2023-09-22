@@ -27,7 +27,7 @@ public function main(string category) returns error? {
     string document = string `{ products(productType: "${category}") { name, productsCount } } `;
     InventoryResponse inventories = check shopify->execute(document);
     CsvRecord[] csvContent = [];
-    foreach Inventory {name, productsCount} in inventories.data.products {
+    foreach var {name, productsCount} in inventories.data.products {
         if productsCount < 10 {
             csvContent.push({name: name, requestType: URGENT});
         } else if productsCount < 25 {
