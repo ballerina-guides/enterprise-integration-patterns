@@ -1,5 +1,7 @@
 tagline: Route messages to different output channels
 desc: Message router consumes a message from one channel and republishes it to a different channel depending on a set of conditions.
+category: Messaging Systems
+index: 3
 helps: Ballerina supports conditional logic with if-else and match statements.
        This can be used to route messages based on message content, header, or any custom logic.
        Ballerina type system supports union types (e.g. `Country` enum below is a union) which helps to define choices in a type-safe and readable manner.
