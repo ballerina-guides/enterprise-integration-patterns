@@ -33,7 +33,7 @@ final http:Client dhl = check new ("http://api.dhl.com.balmock.io");
 
 service /shipments on new http:Listener(8080) {
 
-    resource function post status (TrackingRequest request) returns string|error {
+    resource function post status(TrackingRequest request) returns string|error {
         match request.country {
             UK => {
                 DhlUkResponse response = check dhl->/parceluk/tracking/v1/shipments(trackingNumber = request.tracking_id);

@@ -17,6 +17,6 @@ service /api/v1 on new http:Listener(8080) {
                 _ = check formSubmitClient->/survay/[id]/submit.post({userId: survayData}, targetType = http:Response);
                 _ = partialSurveys.remove(userId);
             }
-        }         
-    }    
+        }
+    }
 }

@@ -122,7 +122,7 @@ function creeateDhlShipment(OrderResponse response) returns DHLResponse|error {
 
 function sendConfirmationMail(string name, string email, string trackingNumber) returns error? {
     string body = string `<p>Hello ${name}!</p><p>Your Order has been shipped. ` +
-                  string `Track your order using ${trackingNumber}</p>`;
+                string `Track your order using ${trackingNumber}</p>`;
     var mailReq = {
         toInfo: email,
         fromInfo: "orders@blackwell.com",

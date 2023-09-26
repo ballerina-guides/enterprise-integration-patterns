@@ -1,7 +1,7 @@
 tagline: Notify other applications about something that happened
-helps: Ballerina libraries such as http, kafka, websocket provide `Listener`s,
+helps: Ballerina packages such as http, kafka, websocket, etc., in the Ballerina library provide listeners,
   through which you can consume events from other applications. Each such
-  library provides protocol-specific message sending apis as well.
+  package provides protocol-specific message sending APIs as well.
 desc: Event message notifies other applications about something that happened.
   Unlike document message, the focus is on the timing of the message rather than
   the content.
