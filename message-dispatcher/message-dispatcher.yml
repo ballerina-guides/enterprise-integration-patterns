@@ -1,3 +1,4 @@
+tagline: Coordinate message processing
 category: Messaging Endpoints
 index: 48
 tags: ["Message Dispatcher", "Competing Consumers", "Transactional Client"]

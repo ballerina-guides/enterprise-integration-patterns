@@ -1,3 +1,4 @@
+tagline: Notify other applications about something that happened
 category: Message Construction
 index: 17
 tags: ["Event Message", "Command Message", "Point-to-Point Channel"]

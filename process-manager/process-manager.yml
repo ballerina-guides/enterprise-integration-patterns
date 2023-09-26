@@ -1,3 +1,4 @@
+tagline: Process messages with steps unknown at design time
 category: Message Routing
 index: 34
 tags: ["Process Manager", "Command Message", "Aggregator", "Point-to-Point Channel"]

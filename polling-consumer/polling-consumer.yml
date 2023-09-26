@@ -1,3 +1,4 @@
+tagline: Consume messages when the application is ready
 category: Messaging Endpoints
 index: 45
 tags: ["Polling Consumer", "Durable Subscriber", "Message"]
