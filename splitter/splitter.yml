@@ -1,3 +1,4 @@
 category: Message Routing
 index: 28
+tags: ["Splitter", "Content Filter", "Event Message"]
 link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html

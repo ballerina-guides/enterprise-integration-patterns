@@ -1,7 +1,6 @@
 import ballerina/http;
 import ballerina/mime;
 import ballerina/url;
-import ballerina/io;
 
 type ReminderRequest record {
     string date;
@@ -38,7 +37,6 @@ function sendReminder(Attendee attendee, string eventName, string date) returns 
     string payload = "From=" + check url:encode(FROM_NO, "utf-8") +
                      "&To=" + check url:encode(attendee.number, "utf-8") +
                      "&Body=" + check url:encode(body, "utf-8");
-                     io:println(payload);
     twilioReq.setTextPayload(payload, contentType = mime:APPLICATION_FORM_URLENCODED);
     _ = check twilio->/[API_VERSION]/Accounts/[TWILIO_SID]/Messages\.json.post(twilioReq, targetType = http:Response);
 }

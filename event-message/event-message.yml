@@ -1,3 +1,4 @@
 category: Message Construction
 index: 17
+tags: ["Event Message", "Command Message", "Point-to-Point Channel"]
 link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/EventMessage.html

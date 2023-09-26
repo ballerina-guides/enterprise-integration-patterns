@@ -1,3 +1,4 @@
 category: Messaging Endpoints
 index: 45
+tags: ["Polling Consumer", "Durable Subscriber", "Message"]
 link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/PollingConsumer.html
