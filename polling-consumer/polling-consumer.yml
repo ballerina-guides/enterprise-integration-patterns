@@ -1,6 +1,6 @@
 tagline: Consume messages when the application is ready
 desc: Polling consumer consumes messages from a channel when the application is ready to process them.
-helps: Ballerina's concurrency model enables writing simple procedural code that nevertheless executed in a non-blocking manner. In below example, `sleep` dos not block the underlying thread. Other Ballerina concurrency constructs, such `wait`, behave similarly.
+helps: Ballerina's concurrency model enables writing simple procedural code that is nevertheless executed in a non-blocking manner. In the below example, `sleep` does not block the underlying thread. Other Ballerina concurrency constructs, such as `wait`, behave similarly.
 category: Messaging Endpoints
 index: 45
 tags: ["Polling Consumer", "Durable Subscriber", "Message"]
