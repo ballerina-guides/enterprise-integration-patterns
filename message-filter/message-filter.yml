@@ -1,5 +1,5 @@
 tagline: Filter uninterested messages
-desc: Message filter neglects the unintersted messages based on a critria and publish the filtered message to another channel.
+desc: Message filter neglects the uninterested messages based on criteria and publishes the filtered message to another channel.
 category: Message Routing
 index: 25
 helps: Ballerina enables filtering messages using basic control structures such as if and switch statements.
