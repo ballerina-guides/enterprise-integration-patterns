@@ -32,8 +32,8 @@ service /api/v1 on new graphql:Listener(8080) {
             ...purchasingRequest,
             invoiceId: uuid:createType1AsString(),
             total: from var {unitPrice, quantity} in purchasingRequest.items
-                let var itemTotalPrice = unitPrice * quantity
-                collect sum(itemTotalPrice)
+                   let var itemTotalPrice = unitPrice * quantity
+                   collect sum(itemTotalPrice)
         };
         invoices.add(invoice);
         return invoice;

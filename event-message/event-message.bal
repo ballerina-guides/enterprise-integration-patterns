@@ -25,8 +25,8 @@ service /api/v1 on new http:Listener(8080) {
                               ${req.incident.date} at ${req.incident.time}.`;
         http:Request twilioReq = new;
         string payload = "From=" + check url:encode(FROM_NO, "utf-8") +
-                        "&To=" + check url:encode(req.phoneNo, "utf-8") +
-                        "&Body=" + check url:encode(body, "utf-8");
+                         "&To=" + check url:encode(req.phoneNo, "utf-8") +
+                         "&Body=" + check url:encode(body, "utf-8");
         twilioReq.setTextPayload(payload, contentType = mime:APPLICATION_FORM_URLENCODED);
         _ = check twilio->/[API_VERSION]/Accounts/[TWILIO_SID]/Messages\.json.post(twilioReq,
             targetType = http:Response
