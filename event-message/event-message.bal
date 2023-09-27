@@ -29,6 +29,7 @@ service /api/v1 on new http:Listener(8080) {
                          "&Body=" + check url:encode(body, "utf-8");
         twilioReq.setTextPayload(payload, contentType = mime:APPLICATION_FORM_URLENCODED);
         _ = check twilio->/[API_VERSION]/Accounts/[TWILIO_SID]/Messages\.json.post(twilioReq,
-            targetType = http:Response);
+            targetType = http:Response
+        );
     }
 }

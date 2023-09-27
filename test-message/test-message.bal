@@ -1,7 +1,7 @@
 import ballerina/http;
+import ballerina/sql;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-import ballerina/sql;
 
 service /customer on new http:Listener(8080) {
     private mysql:Client? db = null;
