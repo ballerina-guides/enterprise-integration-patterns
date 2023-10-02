@@ -1,9 +1,6 @@
 {
-    "totalRevenue": 5200000.00,
+    "revenue": 5200000.00,
     "operatingExpenses": 1300000.00,
-    "profit": 4500000.00,
     "production": 70000,
-    "productionEfficiency": "86%",
-    "totalEmployees": 740,
-    "turnover": "4%"
+    "totalEmployees": 740
 }
