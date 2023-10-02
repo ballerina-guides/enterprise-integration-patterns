@@ -22,21 +22,20 @@ type AggregratedInfo record {|
     map<int> productivityByState;
 |};
 
-final map<string> stateRoutes = {
-    Texas: "http://api.texas.office.com.balmock.io",
-    Ohio: "http://api.ohio.office.com.balmock.io",
-    Florida: "http://api.florida.office.com.balmock.io"
+final map<http:Client> stateRoutes = {
+    Texas: check new ("http://api.texas.office.com.balmock.io"),
+    Ohio: check new ("http://api.ohio.office.com.balmock.io"),
+    Florida: check new ("http://api.florida.office.com.balmock.io")
 };
 
 service /api/v1 on new http:Listener(8080) {
     resource function post dashboard(InfoRequest infoRequest) returns AggregratedInfo|error {
         AggregratedInfo summary = initSummary();
         foreach string state in infoRequest.states {
-            string? stateRoute = stateRoutes[state];
-            if stateRoute == () {
+            http:Client? stateClient = stateRoutes[state];
+            if stateClient == () {
                 return error("Invalid state provided");
             }
-            http:Client stateClient = check new (stateRoute);
             StateInfo stateInfo = check stateClient->/statistics();
             aggregateInfo(state, stateInfo, summary);
         }
