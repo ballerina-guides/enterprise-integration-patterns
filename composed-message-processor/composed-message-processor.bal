@@ -28,19 +28,9 @@ final map<string> stateRoutes = {
     Florida: "http://api.florida.office.com.balmock.io"
 };
 
-AggregratedInfo summary = {
-    revenueByState: {},
-    totalRevenue: 0.0,
-    maxRevenue: 0.0,
-    maxRevenueState: "",
-    operatingExpensesByState: {},
-    totalOperatingExpenses: 0.0,
-    totalProduction: 0,
-    productivityByState: {}
-};
-
 service /api/v1 on new http:Listener(8080) {
-    resource function post state\-info(InfoRequest infoRequest) returns AggregratedInfo|error? {
+    resource function post dashboard(InfoRequest infoRequest) returns AggregratedInfo|error? {
+        AggregratedInfo summary = initSummary();
         foreach string state in infoRequest.states {
             string? stateRoute = stateRoutes[state];
             if stateRoute == () {
@@ -48,13 +38,26 @@ service /api/v1 on new http:Listener(8080) {
             }
             http:Client stateClient = check new (stateRoute);
             StateInfo stateInfo = check stateClient->/statistics();
-            aggregateInfo(state, stateInfo);
+            summary = aggregateInfo(state, stateInfo, summary);
         }
         return summary;
     }
 }
 
-function aggregateInfo(string state, StateInfo stateInfo) {
+function initSummary() returns AggregratedInfo{
+    return {
+        revenueByState: {},
+        totalRevenue: 0.0,
+        maxRevenue: 0.0,
+        maxRevenueState: "",
+        operatingExpensesByState: {},
+        totalOperatingExpenses: 0.0,
+        totalProduction: 0,
+        productivityByState: {}
+    };
+}
+
+function aggregateInfo(string state, StateInfo stateInfo, AggregratedInfo summary) returns AggregratedInfo {
     summary.revenueByState[state] = stateInfo.revenue;
     summary.totalRevenue += stateInfo.revenue;
     summary.operatingExpensesByState[state] = stateInfo.operatingExpenses;
@@ -63,4 +66,5 @@ function aggregateInfo(string state, StateInfo stateInfo) {
     summary.maxRevenueState = summary.maxRevenue < stateInfo.revenue ? state : summary.maxRevenueState;
     summary.maxRevenue = summary.maxRevenue < stateInfo.revenue ? stateInfo.revenue : summary.maxRevenue;
     summary.productivityByState[state] = stateInfo.production / stateInfo.totalEmployees;
+    return summary;
 }
