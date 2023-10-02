@@ -29,7 +29,7 @@ final map<string> stateRoutes = {
 };
 
 service /api/v1 on new http:Listener(8080) {
-    resource function post dashboard(InfoRequest infoRequest) returns AggregratedInfo|error? {
+    resource function post dashboard(InfoRequest infoRequest) returns AggregratedInfo|error {
         AggregratedInfo summary = initSummary();
         foreach string state in infoRequest.states {
             string? stateRoute = stateRoutes[state];
@@ -38,13 +38,13 @@ service /api/v1 on new http:Listener(8080) {
             }
             http:Client stateClient = check new (stateRoute);
             StateInfo stateInfo = check stateClient->/statistics();
-            summary = aggregateInfo(state, stateInfo, summary);
+            aggregateInfo(state, stateInfo, summary);
         }
         return summary;
     }
 }
 
-function initSummary() returns AggregratedInfo{
+function initSummary() returns AggregratedInfo {
     return {
         revenueByState: {},
         totalRevenue: 0.0,
@@ -57,7 +57,7 @@ function initSummary() returns AggregratedInfo{
     };
 }
 
-function aggregateInfo(string state, StateInfo stateInfo, AggregratedInfo summary) returns AggregratedInfo {
+function aggregateInfo(string state, StateInfo stateInfo, AggregratedInfo summary) {
     summary.revenueByState[state] = stateInfo.revenue;
     summary.totalRevenue += stateInfo.revenue;
     summary.operatingExpensesByState[state] = stateInfo.operatingExpenses;
@@ -66,5 +66,4 @@ function aggregateInfo(string state, StateInfo stateInfo, AggregratedInfo summar
     summary.maxRevenueState = summary.maxRevenue < stateInfo.revenue ? state : summary.maxRevenueState;
     summary.maxRevenue = summary.maxRevenue < stateInfo.revenue ? stateInfo.revenue : summary.maxRevenue;
     summary.productivityByState[state] = stateInfo.production / stateInfo.totalEmployees;
-    return summary;
 }
