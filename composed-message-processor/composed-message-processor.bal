@@ -1,25 +1,25 @@
 import ballerina/http;
 
-type InfoRequest record {|
+type SalesByStateRequest record {|
     string[] states;
 |};
 
-type StateInfo record {|
+type SalesByState record {|
     decimal revenue;
     decimal operatingExpenses;
     int production;
     int totalEmployees;
 |};
 
-type AggregratedInfo record {|
-    map<decimal> revenueByState;
-    decimal totalRevenue;
-    decimal maxRevenue;
-    string maxRevenueState;
-    map<decimal> operatingExpensesByState;
-    decimal totalOperatingExpenses;
-    int totalProduction;
-    map<int> productivityByState;
+type AggregratedSales record {|
+    map<decimal> revenueByState = {};
+    decimal totalRevenue = 0.0;
+    decimal maxRevenue = 0.0;
+    string maxRevenueState = "";
+    map<decimal> operatingExpensesByState = {};
+    decimal totalOperatingExpenses = 0.0;
+    int totalProduction = 0;
+    map<int> productivityByState = {};
 |};
 
 final map<http:Client> stateRoutes = {
@@ -29,40 +29,27 @@ final map<http:Client> stateRoutes = {
 };
 
 service /api/v1 on new http:Listener(8080) {
-    resource function post dashboard(InfoRequest infoRequest) returns AggregratedInfo|error {
-        AggregratedInfo summary = initSummary();
-        foreach string state in infoRequest.states {
+    resource function post sales\-dashboard(SalesByStateRequest salesRequest) returns AggregratedSales|error {
+        AggregratedSales summary = {};
+        foreach string state in salesRequest.states {
             http:Client? stateClient = stateRoutes[state];
             if stateClient == () {
                 return error("Invalid state provided");
             }
-            StateInfo stateInfo = check stateClient->/statistics();
-            aggregateInfo(state, stateInfo, summary);
+            SalesByState salesByState = check stateClient->/sales();
+            aggregateAllSales(summary, state, salesByState);
         }
         return summary;
     }
 }
 
-function initSummary() returns AggregratedInfo {
-    return {
-        revenueByState: {},
-        totalRevenue: 0.0,
-        maxRevenue: 0.0,
-        maxRevenueState: "",
-        operatingExpensesByState: {},
-        totalOperatingExpenses: 0.0,
-        totalProduction: 0,
-        productivityByState: {}
-    };
-}
-
-function aggregateInfo(string state, StateInfo stateInfo, AggregratedInfo summary) {
-    summary.revenueByState[state] = stateInfo.revenue;
-    summary.totalRevenue += stateInfo.revenue;
-    summary.operatingExpensesByState[state] = stateInfo.operatingExpenses;
-    summary.totalOperatingExpenses += stateInfo.operatingExpenses;
-    summary.totalProduction += stateInfo.production;
-    summary.maxRevenueState = summary.maxRevenue < stateInfo.revenue ? state : summary.maxRevenueState;
-    summary.maxRevenue = summary.maxRevenue < stateInfo.revenue ? stateInfo.revenue : summary.maxRevenue;
-    summary.productivityByState[state] = stateInfo.production / stateInfo.totalEmployees;
+function aggregateAllSales(AggregratedSales summary, string state, SalesByState salesByState) {
+    summary.revenueByState[state] = salesByState.revenue;
+    summary.totalRevenue += salesByState.revenue;
+    summary.operatingExpensesByState[state] = salesByState.operatingExpenses;
+    summary.totalOperatingExpenses += salesByState.operatingExpenses;
+    summary.totalProduction += salesByState.production;
+    summary.maxRevenueState = summary.maxRevenue < salesByState.revenue ? state : summary.maxRevenueState;
+    summary.maxRevenue = summary.maxRevenue < salesByState.revenue ? salesByState.revenue : summary.maxRevenue;
+    summary.productivityByState[state] = salesByState.production / salesByState.totalEmployees;
 }
