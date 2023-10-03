@@ -29,7 +29,7 @@ final map<http:Client> stateRoutes = {
 };
 
 service /api/v1 on new http:Listener(8080) {
-    resource function post sales\-dashboard(SalesByStateRequest salesRequest) returns AggregratedSales|error {
+    resource function post dashboard(SalesByStateRequest salesRequest) returns AggregratedSales|error {
         AggregratedSales summary = {};
         foreach string state in salesRequest.states {
             http:Client? stateClient = stateRoutes[state];
@@ -37,13 +37,13 @@ service /api/v1 on new http:Listener(8080) {
                 return error("Invalid state provided");
             }
             SalesByState salesByState = check stateClient->/sales();
-            aggregateAllSales(summary, state, salesByState);
+            aggregateSales(summary, state, salesByState);
         }
         return summary;
     }
 }
 
-function aggregateAllSales(AggregratedSales summary, string state, SalesByState salesByState) {
+function aggregateSales(AggregratedSales summary, string state, SalesByState salesByState) {
     summary.revenueByState[state] = salesByState.revenue;
     summary.totalRevenue += salesByState.revenue;
     summary.operatingExpensesByState[state] = salesByState.operatingExpenses;
