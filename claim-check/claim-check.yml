@@ -1,0 +1,5 @@
+tagline: Reduce message volume and send across the system without losing message content
+desc: 
+helps:
+tags: ["Claim Check", "Content Enricher", "Content Filter"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/StoreInLibrary.html
