@@ -1,0 +1,7 @@
+tagline: 
+desc: 
+category: Message Construction
+index: 20
+helps: 
+tags: ["Correlation Identifier", "Request Reply", "Selective Consumer", "Messsage"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/CorrelationIdentifier.html

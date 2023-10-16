@@ -1,0 +1,7 @@
+tagline: 
+desc: 
+category: Messaging Endpoints
+index: 51
+helps: 
+tags: ["Idempotent Receiver", "Message", "Message Channel"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/IdempotentReceiver.html
