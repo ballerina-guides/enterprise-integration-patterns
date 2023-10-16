@@ -1,0 +1,7 @@
+tagline: 
+desc: 
+category: Message Channel
+index: 6
+helps: 
+tags: ["Point to Point Channel", "Message Channel", "Command Message"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/PointToPointChannel.html

@@ -1,0 +1,7 @@
+tagline: 
+desc: 
+category: Message Router
+index: 31
+helps: 
+tags: ["Composed Message Processor", "Aggregator", "Content Based Router"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/DistributionAggregate.html

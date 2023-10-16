@@ -1,7 +1,7 @@
 import ballerina/http;
 import ballerina/io;
 
-type ActivateLine readonly & record {|
+public type ActivateLine readonly & record {|
     string customerId;
     string phoneNumber;
     "NEW ACTIVATION"|"TRANSFER" activationType;

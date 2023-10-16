@@ -1,0 +1,7 @@
+tagline: Filters the recived messages using a critiria
+desc: Selective consumer filters the messages which comes from a message channel using a critiria.
+category: Messaging Endpoints
+index: 49
+helps: 
+tags: ["Selective Consumer", "Message Filter", "Content Based Router", "Message"]
+link: https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageSelector.html
