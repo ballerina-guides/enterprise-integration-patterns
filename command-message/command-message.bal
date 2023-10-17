@@ -26,7 +26,7 @@ type UserGroupCreationResponse record {
 final http:Client slackClient = check new ("http://api.slack.com.balmock.io");
 
 service /api/v1 on new http:Listener(8080) {
-    isolated resource function post createUserGroup(UserGroupCreateRequest userGroup) 
+    isolated resource function post createUserGroup(UserGroupCreateRequest userGroup)
     returns UserGroupCreationResponse|error {
         return slackClient->/api/usergroups\.create.post(userGroup, mediaType = "x-www-form-urlencoded");
     }

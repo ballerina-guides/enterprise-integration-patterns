@@ -12,7 +12,7 @@ type PaypalRespose record {|
     string message;
 |};
 
-final http:Client paypalClient = check new("http://api-m.sandbox.paypal.com.balmock.io");
+final http:Client paypalClient = check new ("http://api-m.sandbox.paypal.com.balmock.io");
 final string encodedHeader = {alg: "none"}.toString().toBytes().toBase64();
 
 service /paypal on new http:Listener(8080) {

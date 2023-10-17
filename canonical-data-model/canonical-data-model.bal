@@ -92,11 +92,11 @@ isolated function getPayload(http:Request request) returns Csv|Gpx|error {
 isolated function convertFromCsvToCanonical(Csv data) returns GeoJson {
     return {
         features: from var member in data
-                    let string X = member.X.toString(), string Y = member.Y.toString()
-                    select {
-                        properties: {X, Y, Name: member.Name, description: member.Description},
-                        geometry: {coordinates: [X, Y]}
-                    }
+                  let string X = member.X.toString(), string Y = member.Y.toString()
+                  select {
+                      properties: {X, Y, Name: member.Name, description: member.Description},
+                      geometry: {coordinates: [X, Y]}
+                  }
     };
 }
 
@@ -124,14 +124,14 @@ isolated function convertFromCanonicalToKml(GeoJson geoJson) returns Kml {
                 <SimpleField name="Name" type="string"/>
             </Schema>
             ${from Feature feature in geoJson.features
-            select xml `<Placemark>
-                    <description>${feature.properties.description}</description>
-                    <Point>
-                        <coordinates>
-                            ${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}
-                        </coordinates>
-                    </Point>
-                </Placemark>`}
+              select xml `<Placemark>
+                            <description>${feature.properties.description}</description>
+                            <Point>
+                                <coordinates>
+                                    ${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}
+                                </coordinates>
+                            </Point>
+                          </Placemark>`}
             </Document>
         </kml>`;
     return kmlData;

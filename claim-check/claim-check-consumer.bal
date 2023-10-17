@@ -1,6 +1,6 @@
-import ballerinax/kafka;
 import ballerina/http;
 import ballerina/io;
+import ballerinax/kafka;
 
 type ScanResult [string, string];
 

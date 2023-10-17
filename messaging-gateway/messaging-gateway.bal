@@ -29,7 +29,7 @@ public class LineConnectionManager {
     }
 
     public function activateLine(ActivateLine activateLine) returns ActivationSuccess|ActivationFailureError {
-        ActivationResponse|error activationResponse = 
+        ActivationResponse|error activationResponse =
             self.lineClinet->/plans/[activateLine.planCode]/activate.post(activateLine);
         if activationResponse is error || activationResponse.status == "REJECTED" {
             return error("Connection activation failure", phoneNumber = activateLine.phoneNumber);
