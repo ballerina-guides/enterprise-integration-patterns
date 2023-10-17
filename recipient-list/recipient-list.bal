@@ -20,7 +20,7 @@ final http:Client smsManagerClient = check new ("http://api.sms.manager.com.balm
 final http:Client notificationManagerClient = check new ("http://api.notification.manager.com.balmock.io");
 
 service /api/v1 on new http:Listener(8080) {
-     
+
     resource function post quotes/[string catergory](Message message) returns error? {
         foreach var {contact, subscription} in recipientList.get(catergory) {
             match subscription {

@@ -5,8 +5,8 @@ configurable string username = "admin";
 configurable string password = "admin";
 
 final jira:ConnectionConfig jiraConfig = {
-    auth : { 
-        username, 
+    auth: {
+        username,
         password
     }
 };

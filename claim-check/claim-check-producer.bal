@@ -1,19 +1,19 @@
 import ballerina/http;
 import ballerina/io;
+import ballerina/mime;
 import ballerina/uuid;
 import ballerinax/kafka;
-import ballerina/mime;
 
-final http:Client awsS3Client = check new("http://bucket.s3.amazonaws.com.balmock,io");
-final kafka:Producer kafkaProducer = check new(kafka:DEFAULT_URL);
+final http:Client awsS3Client = check new ("http://bucket.s3.amazonaws.com.balmock,io");
+final kafka:Producer kafkaProducer = check new (kafka:DEFAULT_URL);
 
 type ScanRequest record {|
     string patientId;
     stream<byte[], io:Error?> fileByteStream;
 |};
 
-service /api/v1  on new http:Listener(8080) {
-    
+service /api/v1 on new http:Listener(8080) {
+
     isolated resource function post scans/mri(http:Request request) returns error? {
         ScanRequest {patientId, fileByteStream} = check scanRequestFromMultipart(request);
 
@@ -39,12 +39,12 @@ isolated function scanRequestFromMultipart(http:Request request) returns ScanReq
         string partName = bodyPart.getContentDisposition().name;
         if partName == "patientId" {
             patientId = check bodyPart.getText();
-        } else if partName == "file"  {
+        } else if partName == "file" {
             fileByteStream = check bodyPart.getByteStream();
         }
     }
     if patientId == () || fileByteStream == () {
-        return error ("Multipart request should contains both patientId and file parts");
+        return error("Multipart request should contains both patientId and file parts");
     }
-    return { fileByteStream, patientId };
+    return {fileByteStream, patientId};
 }

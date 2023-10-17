@@ -1,5 +1,5 @@
-tagline: Filters the recived messages using a critiria
-desc: Selective consumer filters the messages which comes from a message channel using a critiria.
+tagline: Filters the received messages using a criteria
+desc: Selective consumer filters the messages which come from a message channel using a criteria.
 category: Messaging Endpoints
 index: 49
 helps: 

@@ -39,9 +39,9 @@ service /api/v1 on new http:Listener(8080) {
     private final kafka:Producer kafkaPublisher;
 
     function init() returns error? {
-        self.kafkaPublisher = check new(kafka:DEFAULT_URL);
+        self.kafkaPublisher = check new (kafka:DEFAULT_URL);
     }
-    
+
     resource function post process/'order(OrderRequest orderRequest) returns error? {
         check self.kafkaPublisher->send({
             topic: "order-events",
@@ -59,7 +59,7 @@ listener kafka:Listener orderListener = new (kafka:DEFAULT_URL, {
 });
 
 service on orderListener {
-    remote function onConsumerRecord(InvoiceDetails[] invoices) returns error? { 
+    remote function onConsumerRecord(InvoiceDetails[] invoices) returns error? {
         foreach var invoice in invoices {
             processedOrders[invoice.orderId] = {
                 "status": INVOICE_GENERATED,
