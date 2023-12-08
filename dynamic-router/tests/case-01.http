@@ -1,0 +1,24 @@
+POST http://localhost:8080/bulbs/switch
+
+{
+    "roomNo" : 15,
+    "state" : "OFF"
+}
+
+###
+
+POST http://localhost:8080/bulbs/switch
+
+{
+    "roomNo" : 9,
+    "state" : "ON"
+}
+
+###
+
+POST http://localhost:8080/bulbs/switch
+
+{
+    "roomNo" : 15,
+    "state" : "ON"
+}
